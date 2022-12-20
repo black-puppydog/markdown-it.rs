@@ -5,6 +5,7 @@ fn run(input: &str, output: &str) {
     markdown_it::plugins::cmark::add(md);
     markdown_it::plugins::html::add(md);
     markdown_it::plugins::extra::tables::add(md);
+    markdown_it::plugins::extra::typographer::add(md);
     let node = md.parse(&(input.to_owned() + "\n"));
 
     // make sure we have sourcemaps for everything
@@ -749,7 +750,7 @@ fn gfm_4_10_tables_extension_example_203() {
 | --- |
 | bar |"#;
     let output = r#"<p>| abc | def |
-| --- |
+| — |
 | bar |</p>"#;
     run(input, output);
 }
