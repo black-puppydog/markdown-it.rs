@@ -19,6 +19,7 @@ fn run(input: &str, output: &str) {
 
 ///////////////////////////////////////////////////////////////////////////
 // TESTGEN: fixtures/markdown-it/tables.txt
+#[rustfmt::skip]
 mod fixtures_markdown_it_tables_txt {
 use super::run;
 // this part of the file is auto-generated
