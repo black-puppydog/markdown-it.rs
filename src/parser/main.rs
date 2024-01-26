@@ -10,7 +10,7 @@ use crate::parser::inline::{self, InlineParser};
 use crate::parser::linkfmt::{LinkFormatter, MDLinkFormatter};
 use crate::Node;
 
-type RuleFn = fn (&mut Node, &MarkdownIt);
+type RuleFn = fn(&mut Node, &MarkdownIt);
 
 #[derive(Derivative)]
 #[derivative(Debug)]
@@ -53,7 +53,10 @@ impl MarkdownIt {
 
         for rule in self.ruler.iter() {
             rule(&mut node, self);
-            debug_assert!(node.is::<Root>(), "root node of the AST must always be Root");
+            debug_assert!(
+                node.is::<Root>(),
+                "root node of the AST must always be Root"
+            );
         }
         node
     }

@@ -16,8 +16,8 @@ use crate::parser::node::NodeEmpty;
 use crate::{MarkdownIt, Node};
 
 type RuleFns = (
-    fn (&mut BlockState) -> Option<()>,
-    fn (&mut BlockState) -> Option<(Node, usize)>,
+    fn(&mut BlockState) -> Option<()>,
+    fn(&mut BlockState) -> Option<(Node, usize)>,
 );
 
 #[derive(Debug, Default)]
@@ -34,16 +34,20 @@ impl BlockParser {
     /// Generate tokens for input range
     ///
     pub fn tokenize(&self, state: &mut BlockState) {
-        stacker::maybe_grow(64*1024, 1024*1024, || {
+        stacker::maybe_grow(64 * 1024, 1024 * 1024, || {
             let mut has_empty_lines = false;
 
             while state.line < state.line_max {
                 state.line = state.skip_empty_lines(state.line);
-                if state.line >= state.line_max { break; }
+                if state.line >= state.line_max {
+                    break;
+                }
 
                 // Termination condition for nested calls.
                 // Nested calls currently used for blockquotes & lists
-                if state.line_indent(state.line) < 0 { break; }
+                if state.line_indent(state.line) < 0 {
+                    break;
+                }
 
                 // If nesting level exceeded - skip tail to the end. That's not ordinary
                 // situation and we should not care about content.

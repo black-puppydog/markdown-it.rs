@@ -67,7 +67,9 @@ impl<const XHTML: bool> HTMLRenderer<XHTML> {
         }
 
         for name in attr_order {
-            let Some(value) = attr_hash.remove(name) else { continue; };
+            let Some(value) = attr_hash.remove(name) else {
+                continue;
+            };
 
             if name == "class" {
                 self.make_attr(name, &value.join(" "));
@@ -136,7 +138,7 @@ impl<const XHTML: bool> Renderer for HTMLRenderer<XHTML> {
         // only push '\n' if last character isn't it
         match self.result.as_bytes().last() {
             Some(b'\n') | None => {}
-            Some(_) => self.result.push('\n')
+            Some(_) => self.result.push('\n'),
         }
     }
 

@@ -39,11 +39,11 @@ impl Node {
     /// Create a new [Node](Node) with a custom value.
     pub fn new<T: NodeValue>(value: T) -> Self {
         Self {
-            children:   Vec::new(),
-            srcmap:     None,
-            attrs:      Vec::new(),
-            ext:        NodeExtSet::new(),
-            node_type:  TypeKey::of::<T>(),
+            children: Vec::new(),
+            srcmap: None,
+            attrs: Vec::new(),
+            ext: NodeExtSet::new(),
+            node_type: TypeKey::of::<T>(),
             node_value: Box::new(value),
         }
     }
@@ -101,7 +101,7 @@ impl Node {
     /// Replace custom value with another value (this is roughly equivalent
     /// to replacing the entire node and copying children and sourcemaps).
     pub fn replace<T: NodeValue>(&mut self, value: T) {
-        self.node_type  = TypeKey::of::<T>();
+        self.node_type = TypeKey::of::<T>();
         self.node_value = Box::new(value);
     }
 
@@ -112,7 +112,7 @@ impl Node {
         fn walk_recursive<'b>(node: &'b Node, depth: u32, f: &mut impl FnMut(&'b Node, u32)) {
             f(node, depth);
             for n in node.children.iter() {
-                stacker::maybe_grow(64*1024, 1024*1024, || {
+                stacker::maybe_grow(64 * 1024, 1024 * 1024, || {
                     walk_recursive(n, depth + 1, f);
                 });
             }
@@ -128,7 +128,7 @@ impl Node {
         fn walk_recursive(node: &mut Node, depth: u32, f: &mut impl FnMut(&mut Node, u32)) {
             f(node, depth);
             for n in node.children.iter_mut() {
-                stacker::maybe_grow(64*1024, 1024*1024, || {
+                stacker::maybe_grow(64 * 1024, 1024 * 1024, || {
                     walk_recursive(n, depth + 1, f);
                 });
             }
@@ -142,7 +142,7 @@ impl Node {
     pub fn walk_post(&self, mut f: impl FnMut(&Node, u32)) {
         fn walk_recursive(node: &Node, depth: u32, f: &mut impl FnMut(&Node, u32)) {
             for n in node.children.iter() {
-                stacker::maybe_grow(64*1024, 1024*1024, || {
+                stacker::maybe_grow(64 * 1024, 1024 * 1024, || {
                     walk_recursive(n, depth + 1, f);
                 });
             }
@@ -157,7 +157,7 @@ impl Node {
     pub fn walk_post_mut(&mut self, mut f: impl FnMut(&mut Node, u32)) {
         fn walk_recursive(node: &mut Node, depth: u32, f: &mut impl FnMut(&mut Node, u32)) {
             for n in node.children.iter_mut() {
-                stacker::maybe_grow(64*1024, 1024*1024, || {
+                stacker::maybe_grow(64 * 1024, 1024 * 1024, || {
                     walk_recursive(n, depth + 1, f);
                 });
             }
@@ -206,7 +206,7 @@ impl Default for Node {
 }
 
 /// Contents of the specific AST node.
-pub trait NodeValue : Debug + Downcast {
+pub trait NodeValue: Debug + Downcast {
     /// Output HTML corresponding to this node using Renderer API.
     ///
     /// Example implementation looks like this:

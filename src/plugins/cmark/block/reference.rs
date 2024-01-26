@@ -114,7 +114,7 @@ impl Default for ReferenceMap {
 
 impl RootExt for ReferenceMap {}
 
-pub trait CustomReferenceMap : Debug + Downcast + Send + Sync {
+pub trait CustomReferenceMap: Debug + Downcast + Send + Sync {
     /// Insert new element to the reference map. You may return false if it's not a valid label to stop parsing.
     fn insert(&mut self, label: String, destination: String, title: Option<String>) -> bool;
 
@@ -133,23 +133,29 @@ impl DefaultReferenceMap {
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&str, &str, Option<&str>)> {
-        Box::new(self.0.iter().map(|(a, b)| {
-            (a.label.as_str(), b.destination.as_str(), b.title.as_deref())
-        }))
+        Box::new(
+            self.0
+                .iter()
+                .map(|(a, b)| (a.label.as_str(), b.destination.as_str(), b.title.as_deref())),
+        )
     }
 }
 
 impl CustomReferenceMap for DefaultReferenceMap {
     fn insert(&mut self, label: String, destination: String, title: Option<String>) -> bool {
-        let Some(key) = ReferenceMapKey::new(label) else { return false; };
-        self.0.entry(key)
+        let Some(key) = ReferenceMapKey::new(label) else {
+            return false;
+        };
+        self.0
+            .entry(key)
             .or_insert(ReferenceMapEntry::new(destination, title));
         true
     }
 
     fn get(&self, label: &str) -> Option<(&str, Option<&str>)> {
         let key = ReferenceMapKey::new(label.to_owned())?;
-        self.0.get(&key)
+        self.0
+            .get(&key)
             .map(|r| (r.destination.as_str(), r.title.as_deref()))
     }
 }
@@ -213,18 +219,23 @@ impl BlockRule for ReferenceScanner {
     }
 
     fn run(state: &mut BlockState) -> Option<(Node, usize)> {
-
-        if state.line_indent(state.line) >= state.md.max_indent { return None; }
+        if state.line_indent(state.line) >= state.md.max_indent {
+            return None;
+        }
 
         let mut chars = state.get_line(state.line).chars();
 
-        let Some('[') = chars.next() else { return None; };
+        let Some('[') = chars.next() else {
+            return None;
+        };
 
         // Simple check to quickly interrupt scan on [link](url) at the start of line.
         // Can be useful on practice: https://github.com/markdown-it/markdown-it/issues/54
         loop {
             match chars.next() {
-                Some('\\') => { chars.next(); },
+                Some('\\') => {
+                    chars.next();
+                }
                 Some(']') => {
                     if let Some(':') = chars.next() {
                         break;
@@ -232,7 +243,7 @@ impl BlockRule for ReferenceScanner {
                         return None;
                     }
                 }
-                Some(_) => {},
+                Some(_) => {}
                 None => break,
             }
         }
@@ -244,14 +255,20 @@ impl BlockRule for ReferenceScanner {
         'outer: loop {
             next_line += 1;
 
-            if next_line >= state.line_max || state.is_empty(next_line) { break; }
+            if next_line >= state.line_max || state.is_empty(next_line) {
+                break;
+            }
 
             // this may be a code block normally, but after paragraph
             // it's considered a lazy continuation regardless of what's there
-            if state.line_indent(next_line) >= state.md.max_indent { continue; }
+            if state.line_indent(next_line) >= state.md.max_indent {
+                continue;
+            }
 
             // quirk for blockquotes, this line should already be checked by that rule
-            if state.line_offsets[next_line].indent_nonspace < 0 { continue; }
+            if state.line_offsets[next_line].indent_nonspace < 0 {
+                continue;
+            }
 
             // Some tags can terminate paragraph without empty line.
             let old_state_line = state.line;
@@ -283,18 +300,22 @@ impl BlockRule for ReferenceScanner {
                         lines += 1;
                     }
                 }
-                Some(_) => {},
+                Some(_) => {}
                 None => return None,
             }
         }
 
-        let Some((_, ':')) = chars.next() else { return None; };
+        let Some((_, ':')) = chars.next() else {
+            return None;
+        };
 
         // [label]:   destination   'title'
         //         ^^^ skip optional whitespace here
         let mut pos = label_end + 2;
         while let Some((_, ch @ (' ' | '\t' | '\n'))) = chars.next() {
-            if ch == '\n' { lines += 1; }
+            if ch == '\n' {
+                lines += 1;
+            }
             pos += 1;
         }
 
@@ -302,7 +323,9 @@ impl BlockRule for ReferenceScanner {
         //            ^^^^^^^^^^^ parse this
         let href;
         if let Some(res) = full_link::parse_link_destination(str, pos, str.len()) {
-            if pos == res.pos { return None; }
+            if pos == res.pos {
+                return None;
+            }
             href = state.md.link_formatter.normalize_link(&res.str);
             state.md.link_formatter.validate_link(&href)?;
             pos = res.pos;
@@ -320,7 +343,9 @@ impl BlockRule for ReferenceScanner {
         let start = pos;
         let mut chars = str[pos..].chars();
         while let Some(ch @ (' ' | '\t' | '\n')) = chars.next() {
-            if ch == '\n' { lines += 1; }
+            if ch == '\n' {
+                lines += 1;
+            }
             pos += 1;
         }
 
@@ -360,15 +385,17 @@ impl BlockRule for ReferenceScanner {
         }
 
         let references = state.root_ext.get_or_insert_default::<ReferenceMap>();
-        if !references.insert(str[1..label_end].to_owned(), href.clone(), title.clone()) { return None; }
+        if !references.insert(str[1..label_end].to_owned(), href.clone(), title.clone()) {
+            return None;
+        }
 
-        Some((Node::new(
-            Definition { 
-                label: str[1..label_end].to_owned(), 
-                destination: href, 
-                title
-            }), 
-            lines + 1
+        Some((
+            Node::new(Definition {
+                label: str[1..label_end].to_owned(),
+                destination: href,
+                title,
+            }),
+            lines + 1,
         ))
     }
 }

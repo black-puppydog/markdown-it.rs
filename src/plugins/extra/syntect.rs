@@ -43,7 +43,12 @@ impl CoreRule for SyntectRule {
     fn run(root: &mut Node, md: &MarkdownIt) {
         let ss = SyntaxSet::load_defaults_newlines();
         let ts = ThemeSet::load_defaults();
-        let theme = &ts.themes[md.ext.get::<SyntectSettings>().copied().unwrap_or_default().0];
+        let theme = &ts.themes[md
+            .ext
+            .get::<SyntectSettings>()
+            .copied()
+            .unwrap_or_default()
+            .0];
 
         root.walk_mut(|node, _| {
             let mut content = None;

@@ -2,7 +2,7 @@ use crate::parser::core::rule_builder;
 use crate::Node;
 
 /// Each member of block rule chain must implement this trait
-pub trait BlockRule : 'static {
+pub trait BlockRule: 'static {
     fn check(state: &mut super::BlockState) -> Option<()> {
         Self::run(state).map(|_| ())
     }

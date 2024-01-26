@@ -1,7 +1,7 @@
 use crate::{MarkdownIt, Node};
 
 /// Each member of core rule chain must implement this trait
-pub trait CoreRule : 'static {
+pub trait CoreRule: 'static {
     fn run(root: &mut Node, md: &MarkdownIt);
 }
 
@@ -9,11 +9,13 @@ macro_rules! rule_builder {
     ($var: ident) => {
         /// Adjust positioning of a newly added rule in the chain.
         pub struct RuleBuilder<'a, T> {
-            item: &'a mut crate::common::ruler::RuleItem<crate::common::TypeKey, T>
+            item: &'a mut crate::common::ruler::RuleItem<crate::common::TypeKey, T>,
         }
 
         impl<'a, T> RuleBuilder<'a, T> {
-            pub(crate) fn new(item: &'a mut crate::common::ruler::RuleItem<crate::common::TypeKey, T>) -> Self {
+            pub(crate) fn new(
+                item: &'a mut crate::common::ruler::RuleItem<crate::common::TypeKey, T>,
+            ) -> Self {
                 Self { item }
             }
 

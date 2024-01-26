@@ -462,9 +462,7 @@ fn find_first_char_after(
                 content,
                 nesting_level: _,
             } => content,
-            FlatToken::HtmlInline {
-                content,
-            } => content,
+            FlatToken::HtmlInline { content } => content,
             FlatToken::Irrelevant => continue,
         };
         let start_index = if idx_t == token_index {
@@ -502,9 +500,7 @@ fn find_last_char_before(
                 content,
                 nesting_level: _,
             } => content,
-            FlatToken::HtmlInline {
-                content,
-            } => content,
+            FlatToken::HtmlInline { content } => content,
             FlatToken::Irrelevant => continue,
         };
 
@@ -530,7 +526,6 @@ fn find_last_char_before(
     // this will be hit if we find a quote in the first position of the first token
     SPACE
 }
-
 
 #[cfg(test)]
 mod tests {

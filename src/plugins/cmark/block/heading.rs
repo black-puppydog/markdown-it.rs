@@ -14,7 +14,7 @@ pub struct ATXHeading {
 
 impl NodeValue for ATXHeading {
     fn render(&self, node: &Node, fmt: &mut dyn Renderer) {
-        static TAG : [&str; 6] = [ "h1", "h2", "h3", "h4", "h5", "h6" ];
+        static TAG: [&str; 6] = ["h1", "h2", "h3", "h4", "h5", "h6"];
         debug_assert!(self.level >= 1 && self.level <= 6);
 
         fmt.cr();
@@ -33,11 +33,14 @@ pub fn add(md: &mut MarkdownIt) {
 pub struct HeadingScanner;
 impl BlockRule for HeadingScanner {
     fn run(state: &mut BlockState) -> Option<(Node, usize)> {
-
-        if state.line_indent(state.line) >= state.md.max_indent { return None; }
+        if state.line_indent(state.line) >= state.md.max_indent {
+            return None;
+        }
 
         let line = state.get_line(state.line);
-        let Some('#') = line.chars().next() else { return None; };
+        let Some('#') = line.chars().next() else {
+            return None;
+        };
 
         let text_pos;
 
@@ -48,7 +51,9 @@ impl BlockRule for HeadingScanner {
             match chars.next() {
                 Some((_, '#')) => {
                     level += 1;
-                    if level > 6 { return None; }
+                    if level > 6 {
+                        return None;
+                    }
                 }
                 Some((x, ' ' | '\t')) => {
                     text_pos = x;
@@ -65,8 +70,12 @@ impl BlockRule for HeadingScanner {
         // Let's cut tails like '    ###  ' from the end of string
 
         let mut chars_back = chars.rev().peekable();
-        while let Some((_, ' ' | '\t')) = chars_back.peek() { chars_back.next(); }
-        while let Some((_, '#'))        = chars_back.peek() { chars_back.next(); }
+        while let Some((_, ' ' | '\t')) = chars_back.peek() {
+            chars_back.next();
+        }
+        while let Some((_, '#')) = chars_back.peek() {
+            chars_back.next();
+        }
 
         let text_max = match chars_back.next() {
             // ## foo ##
@@ -81,7 +90,8 @@ impl BlockRule for HeadingScanner {
         let mapping = vec![(0, state.line_offsets[state.line].first_nonspace + text_pos)];
 
         let mut node = Node::new(ATXHeading { level });
-        node.children.push(Node::new(InlineRoot::new(content, mapping)));
+        node.children
+            .push(Node::new(InlineRoot::new(content, mapping)));
         Some((node, 1))
     }
 }

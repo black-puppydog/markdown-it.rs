@@ -142,7 +142,9 @@ impl<M: Eq + Hash + Copy + Debug, T: Clone> Ruler<M, T> {
                     RuleItemConstraint::Require(v) => {
                         assert!(
                             idhash.contains_key(v),
-                            "missing dependency: {:?} requires {:?}", dep.marks.get(0).unwrap(), v
+                            "missing dependency: {:?} requires {:?}",
+                            dep.marks.get(0).unwrap(),
+                            v
                         );
                     }
                 }
@@ -153,7 +155,9 @@ impl<M: Eq + Hash + Copy + Debug, T: Clone> Ruler<M, T> {
         'outer: while deps_remaining > 0 {
             for idx in deps_order.iter().copied() {
                 let inserted = deps_inserted.get_mut(idx).unwrap();
-                if *inserted { continue; }
+                if *inserted {
+                    continue;
+                }
 
                 let dlist = deps_graph.get(idx).unwrap();
                 if dlist.is_empty() {
@@ -169,7 +173,8 @@ impl<M: Eq + Hash + Copy + Debug, T: Clone> Ruler<M, T> {
                 }
             }
 
-            #[cfg(debug_assertions)] {
+            #[cfg(debug_assertions)]
+            {
                 // check cycles in dependency graph;
                 // this is very suboptimal, but only used to generate a nice panic message.
                 // in release mode we'll just simply panic
@@ -179,7 +184,9 @@ impl<M: Eq + Hash + Copy + Debug, T: Clone> Ruler<M, T> {
                     while let Some(didx) = vec.pop() {
                         let dlist = deps_graph.get(didx).unwrap();
                         for x in dlist.iter() {
-                            if seen.get(x).is_some() { continue; }
+                            if seen.get(x).is_some() {
+                                continue;
+                            }
                             vec.push(*x);
                             seen.insert(*x, didx);
                             if *x == idx {
@@ -190,9 +197,15 @@ impl<M: Eq + Hash + Copy + Debug, T: Clone> Ruler<M, T> {
                                     curr = *seen.get(&curr).unwrap();
                                 }
                                 backtrack.push(curr);
-                                let path = backtrack.iter()
+                                let path = backtrack
+                                    .iter()
                                     .rev()
-                                    .map(|x| format!("{:?}", self.deps.get(*x).unwrap().marks.get(0).unwrap()))
+                                    .map(|x| {
+                                        format!(
+                                            "{:?}",
+                                            self.deps.get(*x).unwrap().marks.get(0).unwrap()
+                                        )
+                                    })
                                     .collect::<Vec<String>>()
                                     .join(" < ");
                                 panic!("cyclic dependency: {}", path);
@@ -212,10 +225,13 @@ impl<M: Eq + Hash + Copy + Debug, T: Clone> Ruler<M, T> {
 
 impl<M: Eq + Hash + Copy + Debug, T: Clone> Debug for Ruler<M, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let vec: Vec<(usize, M)> = self.compiled.get_or_init(|| self.compile()).0
-                                    .iter()
-                                    .map(|idx| (*idx, *self.deps.get(*idx).unwrap().marks.get(0).unwrap()))
-                                    .collect();
+        let vec: Vec<(usize, M)> = self
+            .compiled
+            .get_or_init(|| self.compile())
+            .0
+            .iter()
+            .map(|idx| (*idx, *self.deps.get(*idx).unwrap().marks.get(0).unwrap()))
+            .collect();
 
         f.debug_struct("Ruler")
             .field("deps", &self.deps)
@@ -240,7 +256,7 @@ impl<M, T> Default for Ruler<M, T> {
 #[derivative(Debug)]
 pub struct RuleItem<M, T> {
     marks: Vec<M>,
-    #[derivative(Debug="ignore")]
+    #[derivative(Debug = "ignore")]
     value: T,
     prio: RuleItemPriority,
     cons: Vec<RuleItemConstraint<M>>,
@@ -350,13 +366,12 @@ enum RuleItemPriority {
     AfterAll,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::Ruler;
 
     #[test]
-    #[should_panic(expected=r#"cyclic dependency: "A" < "B" < "C" < "D" < "E" < "F" < "A""#)]
+    #[should_panic(expected = r#"cyclic dependency: "A" < "B" < "C" < "D" < "E" < "F" < "A""#)]
     #[cfg(debug_assertions)]
     fn cyclic_dependency_debug() {
         let mut r = Ruler::new();
@@ -371,7 +386,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected=r#"cyclic dependency"#)]
+    #[should_panic(expected = r#"cyclic dependency"#)]
     fn cyclic_dependency() {
         let mut r = Ruler::new();
         r.add("A", ()).after("B");
@@ -380,9 +395,8 @@ mod tests {
         r.compile();
     }
 
-
     #[test]
-    #[should_panic(expected=r#"missing dependency: "C" requires "Z"#)]
+    #[should_panic(expected = r#"missing dependency: "C" requires "Z"#)]
     fn missing_require() {
         let mut r = Ruler::new();
         r.add("A", ());

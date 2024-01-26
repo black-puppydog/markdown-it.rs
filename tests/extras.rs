@@ -1,6 +1,5 @@
 use once_cell::sync::Lazy;
 
-
 #[test]
 fn title_example() {
     let parser = &mut markdown_it::MarkdownIt::new();
@@ -14,7 +13,7 @@ fn title_example() {
 
 #[test]
 fn lazy_singleton() {
-    static MD : Lazy<markdown_it::MarkdownIt> = Lazy::new(|| {
+    static MD: Lazy<markdown_it::MarkdownIt> = Lazy::new(|| {
         let mut parser = markdown_it::MarkdownIt::new();
         markdown_it::plugins::cmark::add(&mut parser);
         parser
@@ -45,7 +44,6 @@ fn no_max_indent() {
     assert_eq!(result, "<p>paragraph</p>\n<ul>\n<li>item</li>\n</ul>\n");
 }
 
-
 /*#[test]
 fn no_block_parser() {
     let md = &mut markdown_it::MarkdownIt::new();
@@ -57,7 +55,11 @@ fn no_block_parser() {
 }*/
 
 fn run(input: &str, output: &str) {
-    let output = if output.is_empty() { "".to_owned() } else { output.to_owned() + "\n" };
+    let output = if output.is_empty() {
+        "".to_owned()
+    } else {
+        output.to_owned() + "\n"
+    };
     let md = &mut markdown_it::MarkdownIt::new();
     markdown_it::plugins::cmark::add(md);
     markdown_it::plugins::html::add(md);
@@ -85,8 +87,9 @@ mod markdown_it_rs_extras {
 
     #[test]
     fn tab_offset_in_lists() {
-        run("   > -\tfoo\n   >\n   >         foo\n",
-r#"<blockquote>
+        run(
+            "   > -\tfoo\n   >\n   >         foo\n",
+            r#"<blockquote>
 <ul>
 <li>
 <p>foo</p>
@@ -94,7 +97,8 @@ r#"<blockquote>
 </code></pre>
 </li>
 </ul>
-</blockquote>"#);
+</blockquote>"#,
+        );
     }
 
     #[test]
@@ -184,10 +188,7 @@ r#"<blockquote>
             }
         });
 
-        assert_eq!(
-            collected,
-            vec!["inline", "block", "core"],
-        );
+        assert_eq!(collected, vec!["inline", "block", "core"],);
     }
 }
 
